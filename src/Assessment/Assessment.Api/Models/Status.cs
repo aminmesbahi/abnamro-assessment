@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Assessment.Api.Models
 {
     public enum State
     {
-        Running,
-        Failed,
+        [Description("Running")]
+        Running=0,
+        [Description("Failed")]
+        Failed=1,
+        [Description("Completed")]
         Completed
     }
+
     public class Status
     {
-        public State State { get; set; }
+        public string State { get; set; }
         public int Progress { get; set; }
         public int Result { get; set; }
     }

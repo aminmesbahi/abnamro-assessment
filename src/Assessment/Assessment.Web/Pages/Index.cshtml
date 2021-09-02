@@ -110,8 +110,10 @@
       }).done(function (data) {
         $("#statusInquiryForm").removeClass("d-none");
         $("#returnedHandler").val(data);
+        startTime = performance.now();
       });
     });
+    var startTime, endTime;
     $('#btnGetStatus').on('click', function (evt) {
       evt.preventDefault();
       let calcIcon = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
@@ -124,7 +126,16 @@
         $("#getStatusResult").addClass("d-block");
         console.log(data);
         let jsonData = JSON.parse(data);
-        $("#getStatusResult").html(`Progress: ${jsonData.progress} <br> State: ${jsonData.state} <br> Result: ${((jsonData.result == -1) ? 'Not Ready Yet!' : jsonData.result)}`);
+        let inputVal = $("#requestValue").val();
+
+        console.log(inputVal);
+        endTime = performance.now();
+  var timeDiff = endTime - startTime; //in ms 
+  timeDiff /= 1000; 
+  
+  // get seconds 
+  var seconds = Math.round(timeDiff);
+        $("#getStatusResult").html(`Progress: ${jsonData.progress}% <br> State: ${jsonData.state} <br> Result: ${((jsonData.result == -1) ? 'Not Ready Yet!' : jsonData.result)} <br> <span class="text-black-50 fs-6"><i class="bi bi-stopwatch"></i> ${((jsonData.result == -1) ? 'Elapsed Time: '+ seconds +' seconds' : 'Total Time: '+ (jsonData.result - inputVal) +' seconds')}</span>`);
         console.log(jsonData);
       });
     });

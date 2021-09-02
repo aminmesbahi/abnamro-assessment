@@ -9,7 +9,7 @@ namespace Assessment.Api.Services
 {
     public interface ICalculationService
     {
-        public Guid CreateNew();
+        public Guid CreateNew(int inputValue);
         public bool IsExist(Guid requestId);
         public bool Remove(Guid requestId);
         public List<Calculation> GetCalculationList();
@@ -27,13 +27,12 @@ namespace Assessment.Api.Services
             calculations = new List<Calculation>();
         }
         public List<Calculation> Calculations { get { return calculations; } }
-        public Guid CreateNew()
+        public Guid CreateNew(int inputValue)
         {
             Guid id = Guid.NewGuid();
-            calculations.Add(new Calculation(id));
+            calculations.Add(new Calculation(id, inputValue));
             return id;
         }
-
         public List<Calculation> GetCalculationList()
         {
             return calculations;
@@ -46,7 +45,6 @@ namespace Assessment.Api.Services
         {
             return calculations.Where(c => c.Id == id).FirstOrDefault().Status;
         }
-
         public bool IsExist(Guid requestId)
         {
             if (calculations.Where(c => c.Id == requestId).Count() > 0)
@@ -62,9 +60,15 @@ namespace Assessment.Api.Services
         {
             var rnd = new Random();
             var time = rnd.Next(20, 60);
-            await Task.Delay(time * 1000);
-            calculations.Where(c => c.Id == id).FirstOrDefault().Status.Progress += 10;
-            calculations.Where(c => c.Id == id).FirstOrDefault().Status.Result = time;
+            calculations.Where(c => c.Id == id).FirstOrDefault().Status.State = State.Running.ToDescriptionString();
+            for (int i = 0; i < 100; i++)
+            {
+                await Task.Delay(time*10);
+                calculations.Where(c => c.Id == id).FirstOrDefault().Status.Progress += 1;
+            }
+            var inputVal = calculations.Where(c => c.Id == id).FirstOrDefault().InputValue;
+            calculations.Where(c => c.Id == id).FirstOrDefault().Status.Result = time + inputVal;
+            calculations.Where(c => c.Id == id).FirstOrDefault().Status.State = State.Completed.ToDescriptionString();
         }
         public bool Remove(Guid requestId)
         {

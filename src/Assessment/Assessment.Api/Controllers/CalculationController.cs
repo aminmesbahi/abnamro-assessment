@@ -31,18 +31,28 @@ namespace Assessment.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<string> StartCalculation(int value,CancellationToken cancellationToken)
+        public async Task<string> StartCalculation([FromBody] int inputValue,CancellationToken cancellationToken)
         {
-            var id = _calculation.CreateNew();
+            var id = _calculation.CreateNew(inputValue);
             var calc = _calculation.Calculations.Where(c => c.Id == id).FirstOrDefault();
             await _channelService.Add(calc, cancellationToken);
 
             return id.ToString();
         }
         [HttpPost]
-        public Status GetStatus([FromBody] GetStatusRequestModel model)
+        public IActionResult GetStatus([FromBody] GetStatusRequestModel model)
         {
-            return _calculation.GetCalculationStatus(Guid.Parse(model.ReturnedHandler));
+            Guid id = Guid.Empty;
+            var isGuidCorrect = Guid.TryParse(model.ReturnedHandler, out id);
+            if (isGuidCorrect && _calculation.IsExist(id))
+            {
+                return Ok(_calculation.GetCalculationStatus(Guid.Parse(model.ReturnedHandler)));
+            }
+            else
+            {
+                return BadRequest();
+            }
+            
         }
     }
 }
