@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Assessment.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/v1/[controller]/[action]")]
     public class CalculationController : ControllerBase
     {
         private readonly ILogger<CalculationController> _logger;
@@ -30,8 +30,8 @@ namespace Assessment.Api.Controllers
             return _calculation.GetCalculationList();
         }
 
-        [HttpGet]
-        public async Task<string> CreateNewAndStartAsync(CancellationToken cancellationToken)
+        [HttpPost]
+        public async Task<string> StartCalculation(int value,CancellationToken cancellationToken)
         {
             var id = _calculation.CreateNew();
             var calc = _calculation.Calculations.Where(c => c.Id == id).FirstOrDefault();
@@ -39,10 +39,10 @@ namespace Assessment.Api.Controllers
 
             return id.ToString();
         }
-        [HttpGet]
-        public Status GetStatus(Guid id)
+        [HttpPost]
+        public Status GetStatus([FromBody] GetStatusRequestModel model)
         {
-            return _calculation.GetCalculationStatus(id);
+            return _calculation.GetCalculationStatus(Guid.Parse(model.ReturnedHandler));
         }
     }
 }

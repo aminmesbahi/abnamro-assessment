@@ -1,10 +1,133 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+  ViewData["Title"] = "Assesment Task | Mohammad Amin Mesbahi";
 }
+<div class="row">
+  <div class="col-xs-12 col-lg-4 col-xxl-2">
+    <form class="row g-3 needs-validation" id="startCalculationForm" novalidate method="post">
+      <div class="mb-1">
+        <label for="requestValue" class="form-label">Enter value to calculate:</label>
+        <input type="number" class="form-control" id="requestValue" name="requestValue" min="10" max="99" required />
+        <div class="invalid-tooltip">Please enter a 2-digit number<br>(10 <= value <=99)</div>
+            <div id="requestValueHelpBlock" class="form-text"><span id="requestValueHelpBlockText"
+                class="text-muted">The value must be 2-digits number</span></div>
+        </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <button id="btnStartCalculation" asp-page-handler="StartCalculation" type="submit" class="btn btn-primary px-4"
+          disabled><i class="bi bi-calculator"></i> Start Calculate</button>
+    </form>
+  </div>
+  <div class="col-sx-12 col-lg-6 col-xxl-3 border-start ms-3">
+    <form class="row g-3 d-none ms-3" id="statusInquiryForm" method="post">
+      <div class="mb-1">
+        <label for="returnedHandler" class="form-label">Your Calculation Hendler:</label>
+        <input type="text" class="form-control" id="returnedHandler" name="returnedHandler" readonly />
+        <div id="returnedHandlerHelpBlock" class="form-text"><span id="returnedHandlerHelpBlockText"
+            class="text-muted">The Guid returned from StartCalculation</span></div>
+
+      </div>
+
+      <button id="btnGetStatus" asp-page-handler="GetStatus" type="submit" class="btn btn-info text-light px-4"><i
+          class="bi bi-search"></i> Get Current Status</button>
+    </form>
+    <div id="getStatusResult" class="d-none ms-3 text-info fs-6 mt-3 border-top pt-3">
+
+    </div>
+  </div>
 </div>
+
+<hr class="col-3 col-md-3 my-5 d-none">
+
+
+<div class="row g-5 d-none">
+  <div class="col-md-6">
+    <h2>Starter projects</h2>
+    <p>Ready to beyond the starter template? Check out these open source projects that you can quickly duplicate to a
+      new GitHub repository.</p>
+    <ul class="icon-list">
+      <li><a href="https://github.com/twbs/bootstrap-npm-starter" rel="noopener" target="_blank">Bootstrap npm
+          starter</a></li>
+      <li class="text-muted">Bootstrap Parcel starter (coming soon!)</li>
+    </ul>
+  </div>
+
+  <div class="col-md-6">
+    <h2>Guides</h2>
+    <p>Read more detailed instructions and documentation on using or contributing to Bootstrap.</p>
+    <ul class="icon-list">
+      <li><a href="../getting-started/introduction/">Bootstrap quick start guide</a></li>
+      <li><a href="../getting-started/webpack/">Bootstrap Webpack guide</a></li>
+      <li><a href="../getting-started/parcel/">Bootstrap Parcel guide</a></li>
+      <li><a href="../getting-started/contribute/">Contributing to Bootstrap</a></li>
+    </ul>
+  </div>
+</div>
+
+<hr class="col-3 col-md-3 my-5">
+<div class="row">
+  <h1 class="display-4">Assesment Task</h1>
+  <div class="col-xl-12 col-xxl-8 text-black-50 fs-6">
+    <ol>
+      <li>Write a simple C# (Core 3.1, .NET5+) REST web service with two methods:</li>
+      <ol type="a">
+        <li>GUID StartCalculation(some input values) calculates ‘something’, but takes its time, somewhere between 20
+          seconds and 1 minute.</li>
+        <li>StatusObject GetStatus(GUID) can be called to get a (JSON) status object back. This object should contain
+          the status (i.e. ‘running’, ‘failed’, ‘completed’), progress(10%, 20% etc) and – when completed – the outcome
+          of
+          the calculation.</li>
+      </ol>
+      <li>Write a simple C# Web App that consists of a single page where a user can enter some input data for the
+        calculation. It also contains a ‘start’ button.
+        The web app performs both client and server side validation of the user input (are fields empty, is the value
+        numeric). The Start button will only be enabled when the client validation passes.
+        When the user clicks the button, the REST web service’s startCalculation is fed with the user input. The
+        progress
+        of the calculation is visualised (knock yourself out!) and when the calculation is done, the result is
+        displayed.
+      </li>
+      <li>Both client and server app have sufficient unit tests to prove they work.</li>
+      <li>Version control of the code is done through GitHub (you can create a free account there).</li>
+    </ol>
+    <hr />
+    <p>Bonus 1: The server and/or client use SQL Server to persist their data</p>
+    <p>Bonus 2: The calculation(s) is/are written in stored procedures which are also unit tested</p>
+    <p>Bonus 3: The solution is deployed to an Azure App Service (<a href="https://azure.microsoft.com/en-us/free"
+        target="_blank">free account available here</a>)</p>
+  </div>
+</div>
+@section scripts{
+<script>
+  $(function () {
+    $('#btnStartCalculation').on('click', function (evt) {
+      evt.preventDefault();
+      let calcIcon = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
+      let normIcon = '<i class="bi bi-calculator bi-spin"></i>';
+      $.post('/?handler=StartCalculation', $('#startCalculationForm').serialize(), function () {
+        $("#btnStartCalculation").html(calcIcon);
+        $("#btnStartCalculation").attr("disabled", 'disabled');
+      }).done(function (data) {
+        $("#statusInquiryForm").removeClass("d-none");
+        $("#returnedHandler").val(data);
+      });
+    });
+    $('#btnGetStatus').on('click', function (evt) {
+      evt.preventDefault();
+      let calcIcon = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
+      let normIcon = '<i class="bi bi-calculator bi-spin"></i>';
+      $.post('/?handler=GetStatus', $('#statusInquiryForm').serialize(), function () {
+        $("#btnStartCalculation").html(calcIcon);
+        $("#btnStartCalculation").attr("disabled", 'disabled');
+      }).done(function (data) {
+        $("#getStatusResult").removeClass("d-none");
+        $("#getStatusResult").addClass("d-block");
+        console.log(data);
+        let jsonData = JSON.parse(data);
+        $("#getStatusResult").html(`Progress: ${jsonData.progress} <br> State: ${jsonData.state} <br> Result: ${((jsonData.result == -1) ? 'Not Ready Yet!' : jsonData.result)}`);
+        console.log(jsonData);
+      });
+    });
+  });
+</script>
+}

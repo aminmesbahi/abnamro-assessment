@@ -24,4 +24,4 @@ D:\src\ABN Amro\Assessment\src\Assessment\Assessment.Api\obj\Debug\net5.0\Assess
 D:\src\ABN Amro\Assessment\src\Assessment\Assessment.Api\obj\Debug\net5.0\ref\Assessment.Api.dll
 D:\src\ABN Amro\Assessment\src\Assessment\Assessment.Api\obj\Debug\net5.0\Assessment.Api.pdb
 D:\src\ABN Amro\Assessment\src\Assessment\Assessment.Api\obj\Debug\net5.0\Assessment.Api.genruntimeconfig.cache
-D:\src\ABN Amro\Assessment\src\Assessment\Assessment.Api\obj\Debug\net5.0\Assessment.Api.csproj.CopyComplete
+D:\src\ABN Amro\Assessment\src\Assessment\Assessment.Api\obj\Debug\net5.0\Assessment.Api.csproj.AssemblyReference.cache
