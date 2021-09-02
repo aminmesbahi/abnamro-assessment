@@ -32,7 +32,7 @@ namespace Assessment.Api.Services
 
                     await foreach (var item in _channelService.Get(cancellationToken))
                     {
-                        calculationService.Calculate(item.Id, cancellationToken);
+                        calculationService.Calculate(item.Id,item.ConId, cancellationToken);
                     }
                 }
                 catch (Exception e)

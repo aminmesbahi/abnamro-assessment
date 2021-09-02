@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace Assessment.Web.Pages
                 var uri = new Uri(baseUri+ startCalculationUri);
 
                 var client = new HttpClient();
-                var response = await client.PostAsync(uri.ToString(), new StringContent(model.RequestValue.ToString(), Encoding.UTF8, "application/json"));
+                var response = await client.PostAsync(uri.ToString(), new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"));
                 var responseContent = "";
                 if (response.IsSuccessStatusCode)
                 {

@@ -31,9 +31,9 @@ namespace Assessment.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<string> StartCalculation([FromBody] int inputValue,CancellationToken cancellationToken)
+        public async Task<string> StartCalculation([FromBody] CalculationRequestModel model,CancellationToken cancellationToken)
         {
-            var id = _calculation.CreateNew(inputValue);
+            var id = _calculation.CreateNew(model.RequestValue, model.ConId);
             var calc = _calculation.Calculations.Where(c => c.Id == id).FirstOrDefault();
             await _channelService.Add(calc, cancellationToken);
 

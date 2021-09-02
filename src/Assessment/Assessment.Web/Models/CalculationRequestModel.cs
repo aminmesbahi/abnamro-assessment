@@ -13,5 +13,7 @@ namespace Assessment.Web.Models
         [Required]
         [Range(10,99)]
         public int RequestValue { get; set; }
+
+        public string ConId { get; set; }
     }
 }

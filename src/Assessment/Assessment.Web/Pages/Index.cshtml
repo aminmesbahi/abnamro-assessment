@@ -17,6 +17,13 @@
         <button id="btnStartCalculation" asp-page-handler="StartCalculation" type="submit" class="btn btn-primary px-4"
           disabled><i class="bi bi-calculator"></i> Start Calculate</button>
     </form>
+
+
+
+    <div id="liveStatusResult" class="d-none ms-3 text-info fs-6 mt-3 border-top pt-3">
+
+    </div>
+
   </div>
   <div class="col-sx-12 col-lg-6 col-xxl-3 border-start ms-3">
     <form class="row g-3 d-none ms-3" id="statusInquiryForm" method="post">
@@ -99,43 +106,58 @@
 </div>
 @section scripts{
 <script>
+
   $(function () {
+    var conId;
+    var calcIcon = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
+    var normIcon = '<i class="bi bi-calculator bi-spin"></i> Start Calculate';
+    var connection = new signalR.HubConnectionBuilder()
+      .withUrl('https://localhost:44364/calchub')
+      .configureLogging(signalR.LogLevel.Trace)
+      .build();
+    connection.on("ReceiveStatus", (user, status) => {
+      $("#btnStartCalculation").attr("disabled", 'disabled');
+      var liveContent = `<p>Progress: ${status.progress}% <br> State: ${status.state} <br> Result: ${((status.result == -1) ? 'Not Ready Yet!' : status.result)} <br> </p>`;
+      $("#liveStatusResult").html(liveContent);
+      if(status.progress=="100"){
+        $("#btnStartCalculation").html(normIcon);
+        $("#btnStartCalculation").attr("disabled", 'disabled');
+      }
+    });
+    connection.start().then(function () { connection.invoke("GetConnectionId").then(function (connectionId) { conId = connectionId; console.log(connectionId) }) }).catch(err => console.error(err));
+
+
     $('#btnStartCalculation').on('click', function (evt) {
       evt.preventDefault();
-      let calcIcon = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
-      let normIcon = '<i class="bi bi-calculator bi-spin"></i>';
-      $.post('/?handler=StartCalculation', $('#startCalculationForm').serialize(), function () {
+      var postData = $('#startCalculationForm').serialize() + '&ConId=' + conId;
+      $.post('/?handler=StartCalculation', postData, function () {
         $("#btnStartCalculation").html(calcIcon);
         $("#btnStartCalculation").attr("disabled", 'disabled');
       }).done(function (data) {
+
         $("#statusInquiryForm").removeClass("d-none");
         $("#returnedHandler").val(data);
+        $("#liveStatusResult").removeClass("d-none");
+        $("#liveStatusResult").addClass("d-block");
         startTime = performance.now();
       });
     });
+
+
     var startTime, endTime;
     $('#btnGetStatus').on('click', function (evt) {
       evt.preventDefault();
-      let calcIcon = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
-      let normIcon = '<i class="bi bi-calculator bi-spin"></i>';
       $.post('/?handler=GetStatus', $('#statusInquiryForm').serialize(), function () {
-        $("#btnStartCalculation").html(calcIcon);
-        $("#btnStartCalculation").attr("disabled", 'disabled');
       }).done(function (data) {
         $("#getStatusResult").removeClass("d-none");
         $("#getStatusResult").addClass("d-block");
-        console.log(data);
         let jsonData = JSON.parse(data);
         let inputVal = $("#requestValue").val();
-
-        console.log(inputVal);
         endTime = performance.now();
-  var timeDiff = endTime - startTime; //in ms 
-  timeDiff /= 1000; 
-  
-  // get seconds 
-  var seconds = Math.round(timeDiff);
-        $("#getStatusResult").html(`Progress: ${jsonData.progress}% <br> State: ${jsonData.state} <br> Result: ${((jsonData.result == -1) ? 'Not Ready Yet!' : jsonData.result)} <br> <span class="text-black-50 fs-6"><i class="bi bi-stopwatch"></i> ${((jsonData.result == -1) ? 'Elapsed Time: '+ seconds +' seconds' : 'Total Time: '+ (jsonData.result - inputVal) +' seconds')}</span>`);
+        var timeDiff = endTime - startTime; //in ms 
+        timeDiff /= 1000;
+        var seconds = Math.round(timeDiff);
+        $("#getStatusResult").html(`Progress: ${jsonData.progress}% <br> State: ${jsonData.state} <br> Result: ${((jsonData.result == -1) ? 'Not Ready Yet!' : jsonData.result)} <br> <span class="text-black-50 fs-6"><i class="bi bi-stopwatch"></i> ${((jsonData.result == -1) ? 'Elapsed Time: ' + seconds + ' seconds' : 'Total Time: ' + (jsonData.result - inputVal) + ' seconds')}</span>`);
         console.log(jsonData);
       });
     });

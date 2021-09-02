@@ -24,6 +24,17 @@ namespace Assessment.Api
             services.AddSingleton(typeof(ChannelService<>));
             services.AddHostedService<CalculationWorker>();
 
+            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+            {
+                builder
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .WithOrigins("https://localhost:44367")
+                   .AllowCredentials();
+            }));
+
+            services.AddSignalR();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -40,12 +51,16 @@ namespace Assessment.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Assessment.Api v1"));
             }
-
+            app.UseCors("CorsPolicy");
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoints => {
+                endpoints.MapHub<CalculationHub>("/calchub");
+            });
 
             app.UseEndpoints(endpoints =>
             {

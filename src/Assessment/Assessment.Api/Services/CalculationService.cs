@@ -1,4 +1,5 @@
 ﻿using Assessment.Api.Models;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,28 +10,30 @@ namespace Assessment.Api.Services
 {
     public interface ICalculationService
     {
-        public Guid CreateNew(int inputValue);
+        public Guid CreateNew(int inputValue, string conId);
         public bool IsExist(Guid requestId);
         public bool Remove(Guid requestId);
         public List<Calculation> GetCalculationList();
         public Calculation GetCalculation(Guid id);
         public Status GetCalculationStatus(Guid id);
-        public Task Calculate(Guid id, CancellationToken cancellationToken);
+        public Task Calculate(Guid id,string conId, CancellationToken cancellationToken);
         public List<Calculation> Calculations { get; }
 
     }
     public class InMemoryCalculationService : ICalculationService
     {
         List<Calculation> calculations;
-        public InMemoryCalculationService()
+        private readonly IHubContext<CalculationHub> _hubContext;
+        public InMemoryCalculationService(IHubContext<CalculationHub> hubContext)
         {
             calculations = new List<Calculation>();
+            _hubContext = hubContext;
         }
         public List<Calculation> Calculations { get { return calculations; } }
-        public Guid CreateNew(int inputValue)
+        public Guid CreateNew(int inputValue, string conId)
         {
             Guid id = Guid.NewGuid();
-            calculations.Add(new Calculation(id, inputValue));
+            calculations.Add(new Calculation(id, inputValue, conId));
             return id;
         }
         public List<Calculation> GetCalculationList()
@@ -56,8 +59,9 @@ namespace Assessment.Api.Services
                 return false;
             }
         }
-        public async Task Calculate(Guid id, CancellationToken cancellationToken)
+        public async Task Calculate(Guid id,string conId, CancellationToken cancellationToken)
         {
+            
             var rnd = new Random();
             var time = rnd.Next(20, 60);
             calculations.Where(c => c.Id == id).FirstOrDefault().Status.State = State.Running.ToDescriptionString();
@@ -65,10 +69,13 @@ namespace Assessment.Api.Services
             {
                 await Task.Delay(time*10);
                 calculations.Where(c => c.Id == id).FirstOrDefault().Status.Progress += 1;
+               await _hubContext.Clients.Client(conId).SendAsync("ReceiveStatus", id.ToString(), calculations.Where(c => c.Id == id).FirstOrDefault().Status);
+
             }
             var inputVal = calculations.Where(c => c.Id == id).FirstOrDefault().InputValue;
             calculations.Where(c => c.Id == id).FirstOrDefault().Status.Result = time + inputVal;
             calculations.Where(c => c.Id == id).FirstOrDefault().Status.State = State.Completed.ToDescriptionString();
+            await _hubContext.Clients.Client(conId).SendAsync("ReceiveStatus", id.ToString(), calculations.Where(c => c.Id == id).FirstOrDefault().Status);
         }
         public bool Remove(Guid requestId)
         {
