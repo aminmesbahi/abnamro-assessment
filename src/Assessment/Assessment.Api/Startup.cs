@@ -29,7 +29,7 @@ namespace Assessment.Api
                 builder
                    .AllowAnyMethod()
                    .AllowAnyHeader()
-                   .WithOrigins("https://localhost:44367")
+                   .WithOrigins("https://web.assessment.mesbahi.net")
                    .AllowCredentials();
             }));
 

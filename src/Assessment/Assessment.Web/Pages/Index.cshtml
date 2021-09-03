@@ -112,7 +112,7 @@
     var calcIcon = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
     var normIcon = '<i class="bi bi-calculator bi-spin"></i> Start Calculate';
     var connection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:44364/calchub')
+      .withUrl('https://api.assessment.mesbahi.net/calchub')
       .configureLogging(signalR.LogLevel.Trace)
       .build();
     connection.on("ReceiveStatus", (user, status) => {
