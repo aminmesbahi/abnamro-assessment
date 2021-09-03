@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Assessment.Web.Test
 {
-    public class UnitTest1
+    public class IndexPageTest
     {
         [Fact]
         public void Test1()

@@ -1,3 +1,6 @@
+# Published Version
+* https://web.assessment.mesbahi.net/
+
 # Assignment
 1.	Write a simple C# (Core 3.1, .NET5+) REST web service with two methods:
 
