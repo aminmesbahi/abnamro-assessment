@@ -1,21 +1,21 @@
 ﻿@page
 @model IndexModel
 @{
-  ViewData["Title"] = "Assesment Task | Mohammad Amin Mesbahi";
+  ViewData["Title"] = "Assessment Task | Mohammad Amin Mesbahi";
 }
 <div class="row">
   <div class="col-xs-12 col-lg-4 col-xxl-2">
     <form class="row g-3 needs-validation" id="startCalculationForm" novalidate method="post">
       <div class="mb-1">
-        <label for="requestValue" class="form-label">Enter value to calculate:</label>
+        <label for="requestValue" class="form-label">Enter a value to calculate:</label>
         <input type="number" class="form-control" id="requestValue" name="requestValue" min="10" max="99" required />
         <div class="invalid-tooltip">Please enter a 2-digit number<br>(10 <= value <=99)</div>
             <div id="requestValueHelpBlock" class="form-text"><span id="requestValueHelpBlockText"
-                class="text-muted">The value must be 2-digits number</span></div>
+                class="text-muted">The value must be 2-digit number</span></div>
         </div>
 
         <button id="btnStartCalculation" asp-page-handler="StartCalculation" type="submit" class="btn btn-primary px-4"
-          disabled><i class="bi bi-calculator"></i> Start Calculate</button>
+          disabled><i class="bi bi-calculator"></i> Start calculate</button>
     </form>
 
 
@@ -28,15 +28,15 @@
   <div class="col-sx-12 col-lg-6 col-xxl-3 border-start ms-3">
     <form class="row g-3 d-none ms-3" id="statusInquiryForm" method="post">
       <div class="mb-1">
-        <label for="returnedHandler" class="form-label">Your Calculation Hendler:</label>
+        <label for="returnedHandler" class="form-label">Your Calculation handler:</label>
         <input type="text" class="form-control" id="returnedHandler" name="returnedHandler" readonly />
         <div id="returnedHandlerHelpBlock" class="form-text"><span id="returnedHandlerHelpBlockText"
-            class="text-muted">The Guid returned from StartCalculation</span></div>
+            class="text-muted">The GUID returned from StartCalculation() function</span></div>
 
       </div>
 
       <button id="btnGetStatus" asp-page-handler="GetStatus" type="submit" class="btn btn-info text-light px-4"><i
-          class="bi bi-search"></i> Get Current Status</button>
+          class="bi bi-search"></i> Get current status</button>
     </form>
     <div id="getStatusResult" class="d-none ms-3 text-info fs-6 mt-3 border-top pt-3">
 
@@ -73,7 +73,7 @@
 
 <hr class="col-3 col-md-3 my-5">
 <div class="row">
-  <h1 class="display-4">Assesment Task</h1>
+  <h1 class="display-4">Assessment Task</h1>
   <div class="col-xl-12 col-xxl-8 text-black-50 fs-6">
     <ol>
       <li>Write a simple C# (Core 3.1, .NET5+) REST web service with two methods:</li>
@@ -117,7 +117,7 @@
       .build();
     connection.on("ReceiveStatus", (user, status) => {
       $("#btnStartCalculation").attr("disabled", 'disabled');
-      var liveContent = `<p>Progress: ${status.progress}% <br> State: ${status.state} <br> Result: ${((status.result == -1) ? 'Not Ready Yet!' : status.result)} <br> </p>`;
+      var liveContent = `<p>Progress: ${status.progress}% <br> State: ${status.state} <br> Result: ${((status.result == -1) ? 'Not ready yet!' : status.result)} <br> </p>`;
       $("#liveStatusResult").html(liveContent);
       if(status.progress=="100"){
         $("#btnStartCalculation").html(normIcon);
@@ -157,7 +157,7 @@
         var timeDiff = endTime - startTime; //in ms 
         timeDiff /= 1000;
         var seconds = Math.round(timeDiff);
-        $("#getStatusResult").html(`Progress: ${jsonData.progress}% <br> State: ${jsonData.state} <br> Result: ${((jsonData.result == -1) ? 'Not Ready Yet!' : jsonData.result)} <br> <span class="text-black-50 fs-6"><i class="bi bi-stopwatch"></i> ${((jsonData.result == -1) ? 'Elapsed Time: ' + seconds + ' seconds' : 'Total Time: ' + (jsonData.result - inputVal) + ' seconds')}</span>`);
+        $("#getStatusResult").html(`Progress: ${jsonData.progress}% <br> State: ${jsonData.state} <br> Result: ${((jsonData.result == -1) ? 'Not ready yet!' : jsonData.result)} <br> <span class="text-black-50 fs-6"><i class="bi bi-stopwatch"></i> ${((jsonData.result == -1) ? 'Elapsed Time: ' + seconds + ' seconds' : 'Total time: ' + (jsonData.result - inputVal) + ' seconds')}</span>`);
         console.log(jsonData);
       });
     });
